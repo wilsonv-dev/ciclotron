@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulador de ciclotrón</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Simulador de ciclotrón <small>Etapas 3-4 · geometría y aceleración</small></h1>
+    <div class="chips">
+      <span class="chip chip-status" id="status-chip">Iniciando…</span>
+      <span class="chip">Modelo: clásico no relativista</span>
+      <span class="chip">B uniforme · E alterno solo en el hueco</span>
+    </div>
+  </header>
+
+  <main>
+    <section id="viewport" aria-label="Escena 3D"></section>
+
+    <aside class="panel">
+      <h2>Datos instantáneos</h2>
+      <dl class="hud">
+        <div><dt>Tiempo</dt><dd id="hud-t">–</dd></div>
+        <div><dt>Posición (m)</dt><dd id="hud-pos">–</dd></div>
+        <div><dt>Velocidad (m/s)</dt><dd id="hud-vel">–</dd></div>
+        <div><dt>Rapidez</dt><dd id="hud-speed">–</dd></div>
+        <div><dt>Fuerza de Lorentz</dt><dd id="hud-force">–</dd></div>
+        <div><dt>Energía cinética</dt><dd id="hud-ke">–</dd></div>
+        <div><dt>Trabajo de E (acum.)</dt><dd id="hud-work">–</dd></div>
+        <div><dt>|B|</dt><dd id="hud-b">–</dd></div>
+        <div><dt>E local (en la posición)</dt><dd id="hud-e">–</dd></div>
+        <div><dt>E RF E₀ sin(ωt+φ)</dt><dd id="hud-rf">–</dd></div>
+        <div><dt>Región</dt><dd id="hud-region">–</dd></div>
+        <div><dt>Frec. ciclotrónica fc</dt><dd id="hud-fc">–</dd></div>
+        <div><dt>Frec. RF</dt><dd id="hud-frf">–</dd></div>
+        <div><dt>Pasos (mostrado / calculado)</dt><dd id="hud-steps">–</dd></div>
+      </dl>
+
+      <h2>Radiofrecuencia (campo en el hueco)</h2>
+      <label class="row col">Voltaje V entre dees (kV)
+        <input type="number" id="inp-voltage" min="0" step="1" value="10"></label>
+      <label class="row col">f_RF / fc &nbsp;(1.00 = sincronizada)
+        <input type="number" id="inp-ratio" min="0.2" max="3" step="0.05" value="1"></label>
+      <label class="row col">Fase inicial φ (°)
+        <input type="number" id="inp-phase" step="5" value="90"></label>
+      <p class="hint">Cada cambio recalcula la simulación desde t = 0.</p>
+
+      <h2>Visualización</h2>
+      <label class="row"><input type="checkbox" id="chk-traj" checked> Trayectoria</label>
+      <label class="row"><input type="checkbox" id="chk-axes" checked> Ejes</label>
+      <label class="row"><input type="checkbox" id="chk-arrow" checked> Flecha de velocidad</label>
+      <label class="row"><input type="checkbox" id="chk-fields" checked> Vectores de campo (B y E)</label>
+      <label class="row col">Opacidad de la cámara
+        <input type="range" id="rng-chamber" min="0" max="0.6" step="0.02" value="0.10"></label>
+      <label class="row col">Opacidad de los dees
+        <input type="range" id="rng-dees" min="0" max="0.8" step="0.02" value="0.28"></label>
+      <label class="row col">
+        Reproducción: <output id="rate-out">600</output> pasos/s
+        <input type="range" id="rng-rate" min="50" max="3000" step="50" value="600">
+      </label>
+      <label class="row col">
+        Sentido de B
+        <select id="sel-bsign">
+          <option value="1">+Z (hacia arriba)</option>
+          <option value="-1">−Z (hacia abajo)</option>
+        </select>
+      </label>
+
+      <h2>Leyenda</h2>
+      <ul class="legend">
+        <li><i style="background:#4cc9ff"></i> Partícula (tamaño solo visual)</li>
+        <li><i style="background:#ffb703"></i> Trayectoria (puntos del backend)</li>
+        <li><i style="background:#9dff6a"></i> Velocidad instantánea (solo dirección)</li>
+        <li><i style="background:#18c29c"></i> Dee derecho (x &gt; g/2)</li>
+        <li><i style="background:#d946ef"></i> Dee izquierdo (x &lt; −g/2)</li>
+        <li><i style="background:#ffd54a"></i> Hueco: región con E(t); flechas = E según rf_signal</li>
+        <li><i style="background:#6aa9ff"></i> Cámara de vacío (translúcida)</li>
+        <li><i style="background:#e5e7eb"></i> Fuente de partículas (centro)</li>
+        <li><i style="background:#c77dff"></i> Flechas violeta: B (uniforme) · eje Z</li>
+        <li><i style="background:#ff5c5c"></i> Eje X &nbsp; <i style="background:#4cf08a"></i> Eje Y</li>
+      </ul>
+
+      <div id="messages"></div>
+    </aside>
+  </main>
+
+  <footer class="playbar">
+    <button id="btn-start" class="primary">Iniciar</button>
+    <button id="btn-pause" disabled>Pausar</button>
+    <button id="btn-step">Paso</button>
+    <button id="btn-reset">Reiniciar</button>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
